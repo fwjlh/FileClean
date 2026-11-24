@@ -29,11 +29,9 @@ namespace FileClean
                 return 1;
             }
 
-            if (string.Equals(inputFolder.TrimEnd(Path.DirectorySeparatorChar),
-                              outputFolder.TrimEnd(Path.DirectorySeparatorChar),
-                              StringComparison.OrdinalIgnoreCase))
+            if (IsSameOrChildFolder(inputFolder, outputFolder))
             {
-                Console.Error.WriteLine("Input and output folders must be different.");
+                Console.Error.WriteLine("Output folder must be outside the input folder.");
                 return 1;
             }
 
@@ -47,6 +45,16 @@ namespace FileClean
                 Console.Error.WriteLine(exception.Message);
                 return 2;
             }
+        }
+
+        private static bool IsSameOrChildFolder(string inputFolder, string outputFolder)
+        {
+            string inputPath = inputFolder.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            string outputPath = outputFolder.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            return string.Equals(inputPath, outputPath, StringComparison.OrdinalIgnoreCase) ||
+                   outputPath.StartsWith(inputPath + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) ||
+                   outputPath.StartsWith(inputPath + Path.AltDirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
         }
 
         private static int ProcessFiles(string inputFolder, string outputFolder)
