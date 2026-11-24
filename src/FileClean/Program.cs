@@ -98,23 +98,12 @@ namespace FileClean
 
         private static bool ProcessFile(string inputPath, string outputPath)
         {
-            bool changed = false;
+            string content = File.ReadAllText(inputPath);
+            string converted = WeightRegex.Replace(content, "$1$2");
 
-            using (var reader = new StreamReader(inputPath, Encoding.UTF8, true, 65536))
-            using (var writer = new StreamWriter(outputPath, false, new UTF8Encoding(false), 65536))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    string converted = WeightRegex.Replace(line, "$1$2");
-                    if (!changed && !string.Equals(line, converted, StringComparison.Ordinal))
-                        changed = true;
+            File.WriteAllText(outputPath, converted, new UTF8Encoding(false));
 
-                    writer.WriteLine(converted);
-                }
-            }
-
-            return changed;
+            return !string.Equals(content, converted, StringComparison.Ordinal);
         }
     }
 }
